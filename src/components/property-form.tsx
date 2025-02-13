@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { propertyDataSchema } from "@/validation/propertySchema";
+import { propertySchema } from "@/validation/propertySchema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -22,11 +22,12 @@ import {
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import MultiImageUploader, { ImageUpload } from "./multi-image-uploader";
 
 type Props = {
   submitButtonLabel: React.ReactNode;
-  handleSubmit: (data: z.infer<typeof propertyDataSchema>) => void;
-  defaultValues?: z.infer<typeof propertyDataSchema>;
+  handleSubmit: (data: z.infer<typeof propertySchema>) => void;
+  defaultValues?: z.infer<typeof propertySchema>;
 };
 
 export default function PropertyForm({
@@ -34,7 +35,7 @@ export default function PropertyForm({
   submitButtonLabel,
   defaultValues,
 }: Props) {
-  const combinedDefaultValues: z.infer<typeof propertyDataSchema> = {
+  const combinedDefaultValues: z.infer<typeof propertySchema> = {
     ...{
       status: "draft",
       address1: "",
@@ -45,12 +46,14 @@ export default function PropertyForm({
       bedrooms: 0,
       bathrooms: 0,
       description: "",
+      // add
+      images: [],
     },
     ...defaultValues,
   };
 
-  const form = useForm<z.infer<typeof propertyDataSchema>>({
-    resolver: zodResolver(propertyDataSchema),
+  const form = useForm<z.infer<typeof propertySchema>>({
+    resolver: zodResolver(propertySchema),
     defaultValues: combinedDefaultValues,
   });
 
@@ -199,6 +202,37 @@ export default function PropertyForm({
             />
           </fieldset>
         </div>
+        {/* add urlFormatter */}
+        <FormField
+          control={form.control}
+          name="images"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <MultiImageUploader
+                  onImagesChange={(images: ImageUpload[]) => {
+                    // console.log(images);
+                    form.setValue("images", images);
+                  }}
+                  images={field.value}
+                  // add urlFormatter
+                  // storage image url
+                  // https://firebasestorage.googleapis.com/v0/b/next-tsx-studio.firebasestorage.app/o/properties%2FCZvzQmRwbtki4hYylPUh%2F1739423791048-1-friendlyeats.png?alt=media&token=55c5329f-bd4b-404b-a4a6-1ee5feb8b2e9
+                  urlFormatter={(image) => {
+                    if (!image.file) {
+                      return `https://firebasestorage.googleapis.com/v0/b/next-tsx-studio.firebasestorage.app/o/${encodeURIComponent(
+                        image.url
+                      )}?alt=media`;
+                    }
+                    return image.url;
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button
           type="submit"
           className="max-w-md mx-auto mt-2 w-full flex gap-2"

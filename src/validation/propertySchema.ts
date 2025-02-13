@@ -18,3 +18,15 @@ export const propertyDataSchema = z.object({
     .string()
     .min(40, "Description must contain at least 40 characters"),
 });
+
+export const propertyImagesSchema = z.object({
+  images: z.array(
+    z.object({
+      id: z.string(),
+      url: z.string(),
+      file: z.instanceof(File).optional(),
+    })
+  ),
+});
+
+export const propertySchema = propertyDataSchema.and(propertyImagesSchema);

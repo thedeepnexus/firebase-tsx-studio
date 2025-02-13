@@ -8,6 +8,9 @@ import { z } from "zod";
 import { createProperty } from "./actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { ref, uploadBytesResumable, UploadTask } from "firebase/storage";
+import { storage } from "@/lib/firebase/firebaseClientApp";
+import { savePropertyImages } from "../actions";
 
 export default function NewPropertyForm() {
   const auth = useAuth();
@@ -21,9 +24,12 @@ export default function NewPropertyForm() {
       return;
     }
 
-    const response = await createProperty(data, token);
+    // data = { ...firestore data, storage images }
+    const { images, ...rest } = data;
+    // 1. add rest to firestore
+    const response = await createProperty(rest, token);
 
-    if (!!response.error) {
+    if (!!response.error || !response.propertyId) {
       toast({
         title: "Error",
         description: response.message,
@@ -31,6 +37,32 @@ export default function NewPropertyForm() {
       });
       return;
     }
+
+    // 2. add images to storage
+    // actions return propertyId: property.id,
+    const uploadTasks: UploadTask[] = [];
+    const paths: string[] = [];
+
+    images.forEach((image, index) => {
+      if (image.file) {
+        const path = `properties/${
+          response.propertyId
+        }/${Date.now()}-${index}-${image.file.name}`;
+        paths.push(path);
+        const storageRef = ref(storage, path);
+        uploadTasks.push(uploadBytesResumable(storageRef, image.file));
+      }
+    });
+
+    await Promise.all(uploadTasks);
+    await savePropertyImages(
+      {
+        propertyId: response.propertyId,
+        images: paths,
+      },
+      token
+    );
+
 
     router.push("/admin-dashboard");
 

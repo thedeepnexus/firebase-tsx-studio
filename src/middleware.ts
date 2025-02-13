@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // lab 2: redirect to the root path if the token is missing and the path is not /login
+  // lab 2: redirect to login if the token is missing
   if (token && request.nextUrl.pathname.startsWith("/login")) {
     return NextResponse.redirect(new URL("/", request.url));
   }

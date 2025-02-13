@@ -6,7 +6,7 @@ import { AuthProvider } from "@/context/auth";
 import AuthButton from "@/components/auth-buttons";
 import { HomeIcon } from "lucide-react";
 
-import { Noto_Sans_KR, Poppins } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import { Toaster } from "@/components/ui/toaster";
 
 const notoSansKR = Noto_Sans_KR({
@@ -15,11 +15,11 @@ const notoSansKR = Noto_Sans_KR({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const popins = Poppins({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-});
+// const popins = Poppins({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+//   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+// });
 
 export const metadata: Metadata = {
   title: "Firebase Nextjs Studio",
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${notoSansKR.variable} ${popins.variable} antialiased`}>
+      <body className={`${notoSansKR.variable} antialiased`}>
         <AuthProvider>
           <nav className="flex h-24 items-center justify-between bg-sky-950 p-5 text-white">
             <Link
@@ -43,6 +43,14 @@ export default function RootLayout({
               <span>Home</span>
             </Link>
             <ul className="flex items-center gap-6">
+              <li>
+                <Link
+                  href="/property-search"
+                  className="uppercase tracking-widest hover:underline"
+                >
+                  Property search
+                </Link>
+              </li>
               <li>
                 <AuthButton />
               </li>
