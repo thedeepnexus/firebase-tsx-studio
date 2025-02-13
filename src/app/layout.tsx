@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 import Link from "next/link";
 import { AuthProvider } from "@/context/auth";
@@ -7,6 +7,7 @@ import AuthButton from "@/components/auth-buttons";
 import { HomeIcon } from "lucide-react";
 
 import { Noto_Sans_KR, Poppins } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 const notoSansKR = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",
@@ -48,6 +49,7 @@ export default function RootLayout({
             </ul>
           </nav>
           {children}
+          <Toaster />
         </AuthProvider>
       </body>
     </html>
